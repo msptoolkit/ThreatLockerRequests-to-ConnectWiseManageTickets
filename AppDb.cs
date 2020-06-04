@@ -242,6 +242,52 @@ namespace ManageIntegration
             cmd.Connection.Close();
         }
 
+        public async Task<ThreatLockerOrganization> GetDefaultThreatLockerOrganization()
+        {
+            var threatLockerOrganization = new ThreatLockerOrganization();
+            await Connection.OpenAsync();
+            using (var cmd = new MySqlCommand("SELECT OrganizationId, Name, ManageCompanyId " +
+                "FROM threatlockerorganizations WHERE OrganizationId = \"00000000-0000-0000-0000-000000000000\";", Connection))
+            using (var reader = await cmd.ExecuteReaderAsync())
+                while (await reader.ReadAsync())
+                {
+                    threatLockerOrganization.OrganizationId = reader.GetString(0);
+                    threatLockerOrganization.Name = reader.GetString(1);
+                    threatLockerOrganization.ManageCompanyId = reader.GetInt32(2);
+                };
+            Connection.Close();
+            return threatLockerOrganization;
+        }
+
+        public async Task SaveDefaultThreatLockerOrganization(ThreatLockerOrganization threatLockerOrganization)
+        {
+            var manageConfig = new ManageConfig();
+
+            await Connection.OpenAsync();
+            using var cmd = Connection.CreateCommand();
+            cmd.CommandText = @"INSERT IGNORE INTO threatlockerorganizations (OrganizationId, Name, ManageCompanyId)  VALUES (@OrganizationId, @Name, @ManageCompanyId) ON DUPLICATE KEY UPDATE Name = @Name, ManageCompanyId = @ManageCompanyId;";
+            cmd.Parameters.Add(new MySqlParameter
+            {
+                ParameterName = "@OrganizationId",
+                DbType = DbType.String,
+                Value = "00000000-0000-0000-0000-000000000000"
+            });
+            cmd.Parameters.Add(new MySqlParameter
+            {
+                ParameterName = "@Name",
+                DbType = DbType.String,
+                Value = "Catch-All Company"
+            });
+            cmd.Parameters.Add(new MySqlParameter
+            {
+                ParameterName = "@ManageCompanyId",
+                DbType = DbType.Int32,
+                Value = threatLockerOrganization.ManageCompanyId
+            });
+            await cmd.ExecuteNonQueryAsync();
+            cmd.Connection.Close();
+        }
+
         public async Task SaveThreatLockerOrganizations(List<ThreatLockerOrganization> threatLockerOrganizations)
         {
             foreach (var org in threatLockerOrganizations)

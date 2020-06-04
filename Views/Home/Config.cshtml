@@ -6,8 +6,10 @@
     <script src="~/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
 }
+
 <div class="col-md-6 offset-md-3">
     <div class="card card-body bg-light">
+        <h4>@ViewData["Title"]</h4>
         <form method="post">
             <div asp-validation-summary="ModelOnly"></div>
 

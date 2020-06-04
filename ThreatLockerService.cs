@@ -12,12 +12,12 @@ using Microsoft.Extensions.Logging;
 
 namespace TLManageService
 {
-    public class Worker : BackgroundService
+    public class ThreatLockerService : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<ThreatLockerService> _logger;
         private readonly AppDb _appDb;
 
-        public Worker(ILogger<Worker> logger, AppDb appDb)
+        public ThreatLockerService(ILogger<ThreatLockerService> logger, AppDb appDb)
         {
             _logger = logger;
             _appDb = appDb;
@@ -46,14 +46,23 @@ namespace TLManageService
                     _logger.LogInformation($"{threatLockerRequests.Count} requests found.");
                     foreach (var request in threatLockerRequests)
                     {
-                        _logger.LogInformation($"Request Found");
+
+                        _logger.LogInformation($"Matching Companies");
                         foreach (var org in threatLockerOrganizations)
                         {
+
                             if (org.OrganizationId == request.OrganizationId)
                             {
                                 manageTicket.Company = new ManageCompany { Id = org.ManageCompanyId };
+                                _logger.LogInformation($"{manageTicket.Company.Name} matched {org.Name}");
                             }
-                            //default company
+                            
+                        }
+                        
+                        if (manageTicket.Company.Id <= 0)
+                        {
+                            var defaultThreatLockerOrganization = await _appDb.GetDefaultThreatLockerOrganization();
+                            manageTicket.Company.Id = defaultThreatLockerOrganization.ManageCompanyId;
                         }
 
                         var threatLockerAction = ThreatLockerAccess.ProcessJson(request);

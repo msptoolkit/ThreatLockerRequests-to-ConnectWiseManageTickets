@@ -25,15 +25,6 @@ namespace ManageIntegration.Controllers
             _appDb = appDb;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
         [HttpGet("config")]
         public async Task<IActionResult> Config()
         {
@@ -120,33 +111,37 @@ namespace ManageIntegration.Controllers
             return View(model);
         }
 
-        [HttpGet("companymappings")]
+        [HttpGet("/")]
         public async Task<IActionResult> CompanyMappings()
         {
             CompanyMappingViewModel companyMappingViewModel = new CompanyMappingViewModel();
 
             Config config = await _appDb.GetConfigAsync();
      
-            companyMappingViewModel.threatLockerOrganizations = await _appDb.GetThreatLockerOrganizationsAsync();
-            if (companyMappingViewModel.threatLockerOrganizations == null)
+            companyMappingViewModel.ThreatLockerOrganizations = await _appDb.GetThreatLockerOrganizationsAsync();
+            if (companyMappingViewModel.ThreatLockerOrganizations == null)
             {
-                companyMappingViewModel.threatLockerOrganizations = ThreatLockerAccess.GetOrganizations(config);
+                companyMappingViewModel.ThreatLockerOrganizations = ThreatLockerAccess.GetOrganizations(config);
             }
 
 
-                ViewBag.ManageCompanyList = ManageAccess.GetCompanies(config);
+            companyMappingViewModel.DefaultOrganization = await _appDb.GetDefaultThreatLockerOrganization();
+
+            ViewBag.ManageCompanyList = ManageAccess.GetCompanies(config);
+            companyMappingViewModel.DefaultOrganization = await _appDb.GetDefaultThreatLockerOrganization();
 
             return View(companyMappingViewModel);
         }
 
-        [HttpPost("companymappings")]
+        [HttpPost("")]
         public async Task<IActionResult> CompanyMappings(CompanyMappingViewModel model)
         {
             Config config = await _appDb.GetConfigAsync();
 
             ViewBag.ManageCompanyList = ManageAccess.GetCompanies(config);
 
-            await _appDb.SaveThreatLockerOrganizations(model.threatLockerOrganizations);
+            await _appDb.SaveThreatLockerOrganizations(model.ThreatLockerOrganizations);
+            await _appDb.SaveDefaultThreatLockerOrganization(model.DefaultOrganization);
 
             return View(model);
         }

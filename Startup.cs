@@ -20,8 +20,10 @@ namespace ManageIntegration
         {
             services.AddControllersWithViews();
             services.AddTransient<AppDb>(_ => new AppDb(Configuration["DbStrings:DefaultdB"]));
-            services.AddHostedService<ThreatLockerService>();
-
+            services.AddMvc().AddRazorPagesOptions(options =>
+            {
+                options.Conventions.AddPageRoute("/Home/CompanyMapping", "companymapping");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

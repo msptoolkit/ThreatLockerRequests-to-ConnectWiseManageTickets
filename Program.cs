@@ -23,7 +23,7 @@ namespace TLManageService
                 webBuilder.UseStartup<Startup>();
             }).ConfigureServices((hostContext, services) =>
                 {
-                    services.AddHostedService<Worker>();
+                    services.AddHostedService<ThreatLockerService>();
                 }).UseWindowsService();
     }
 }

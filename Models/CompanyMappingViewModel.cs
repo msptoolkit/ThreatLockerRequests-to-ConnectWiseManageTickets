@@ -9,7 +9,8 @@ namespace ManageIntegration.Models
 {
     public class CompanyMappingViewModel
     {
-        public List<ThreatLockerOrganization> threatLockerOrganizations { get; set; }
-        public List<ThreatLockerOrganization> selectedManageCompanies { get; set; }
+        public List<ThreatLockerOrganization> ThreatLockerOrganizations { get; set; }
+        public List<ManageCompany> ManageCompanies { get; set; }
+        public ThreatLockerOrganization DefaultOrganization { get; set; }
     }
 }

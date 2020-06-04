@@ -16,6 +16,21 @@ namespace ManageIntegration.DAL
 {
     public class ManageAccess
     {
+        public static ManageCompany GetCompany(Config config, int companyId)
+        {
+            var client = new RestClient(config.ManageUrl);
+            client.Authenticator = new HttpBasicAuthenticator(config.ManageCompanyName + "+" + config.ManagePubKey, config.ManagePriKey);
+
+            var request = new RestRequest($"/V4_6_release/apis/3.0/company/companies/{companyId}", DataFormat.Json);
+            request.AddHeader("Accept", "application/vnd.connectwise.com+json; version=3.0.0; application/json");
+            request.AddHeader("clientid", config.ManageClientId);
+
+            var response = client.Get(request);
+
+            var result = JsonConvert.DeserializeObject<ManageCompany>(response.Content);
+
+            return result;
+        }
         public static List<ManageCompany> GetCompanies(Config config)
         {
             var client = new RestClient(config.ManageUrl);
@@ -47,6 +62,7 @@ namespace ManageIntegration.DAL
 
             return result;
         }
+
 
         public static List<ManageCompanyType> GetCompanyTypes(Config config)
         {
