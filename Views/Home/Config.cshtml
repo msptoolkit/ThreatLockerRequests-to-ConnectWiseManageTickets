@@ -1,0 +1,60 @@
+﻿@model Config
+@{
+    ViewBag.Title = "Configuration";
+}
+@section Scripts {
+    <script src="~/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+}
+<div class="col-md-6 offset-md-3">
+    <div class="card card-body bg-light">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="form-group">
+                <label asp-for="ManageUrl">Manage URL</label>
+                <input type="text" asp-for="ManageUrl" class="form-control" />
+                <span asp-validation-for="ManageUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ManagePubKey">Manage Public API Key</label>
+                <input type="text" asp-for="ManagePubKey" class="form-control" />
+                <span asp-validation-for="ManagePubKey" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ManagePriKey">Manage Private API Key</label>
+                <input type="text" asp-for="ManagePriKey" class="form-control" />
+                <span asp-validation-for="ManagePriKey" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ManageCompanyName">Manage Company Name</label>
+                <input type="text" asp-for="ManageCompanyName" class="form-control" />
+                <span asp-validation-for="ManageCompanyName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ManageClientId">Manage Client ID</label>
+                <input type="text" asp-for="ManageClientId" class="form-control" />
+                <span asp-validation-for="ManageClientId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ThreatLockerUrl">ThreatLocker Url</label>
+                <input type="text" asp-for="ThreatLockerUrl" class="form-control" />
+                <span asp-validation-for="ThreatLockerUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ThreatlockerAuth">ThreatLocker Authorization</label>
+                <input type="text" asp-for="ThreatlockerAuth" class="form-control" />
+                <span asp-validation-for="ThreatlockerAuth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RequestCheckDelay">Request Check Delay</label>
+                <input type="text" asp-for="RequestCheckDelay" class="form-control" />
+                <span asp-validation-for="RequestCheckDelay" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary">
+                <div>@ViewBag.UserMessage</div>
+            </div>
+        </form>
+    </div>
+</div>
