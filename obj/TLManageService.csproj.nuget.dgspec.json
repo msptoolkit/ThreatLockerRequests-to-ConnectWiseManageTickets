@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Development\\ThreatLocker\\TLManageService\\TLManageService.csproj": {}
+    "C:\\source\\threatlocker\\TLManageService\\TLManageService.csproj": {}
   },
   "projects": {
-    "D:\\Development\\ThreatLocker\\TLManageService\\TLManageService.csproj": {
+    "C:\\source\\threatlocker\\TLManageService\\TLManageService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Development\\ThreatLocker\\TLManageService\\TLManageService.csproj",
+        "projectUniqueName": "C:\\source\\threatlocker\\TLManageService\\TLManageService.csproj",
         "projectName": "TLManageService",
-        "projectPath": "D:\\Development\\ThreatLocker\\TLManageService\\TLManageService.csproj",
-        "packagesPath": "C:\\Users\\matta\\.nuget\\packages\\",
-        "outputPath": "D:\\Development\\ThreatLocker\\TLManageService\\obj\\",
+        "projectPath": "C:\\source\\threatlocker\\TLManageService\\TLManageService.csproj",
+        "packagesPath": "C:\\Users\\matt.reid\\.nuget\\packages\\",
+        "outputPath": "C:\\source\\threatlocker\\TLManageService\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\matta\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\matt.reid\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -69,6 +69,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
+              "version": "[3.1.4, 3.1.4]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.win-x64",
+              "version": "[3.1.4, 3.1.4]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
+              "version": "[3.1.4, 3.1.4]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -77,7 +91,12 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.202\\RuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "win-x64": {
+          "#import": []
         }
       }
     }

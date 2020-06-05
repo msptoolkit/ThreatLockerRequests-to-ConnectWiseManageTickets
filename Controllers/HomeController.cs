@@ -38,6 +38,13 @@ namespace ManageIntegration.Controllers
         {
             await _appDb.SaveConfigAsync(model);
 
+            List<ManageCompany> manageCompanies = ManageAccess.GetCompanies(model);
+            List<ThreatLockerOrganization> threatLockerOrganizations = ThreatLockerAccess.GetOrganizations(model);
+
+            await _appDb.SaveManageCompanies(manageCompanies);
+            await _appDb.SaveThreatLockerOrganizations(threatLockerOrganizations);
+
+
             return View();
         }
 
@@ -117,7 +124,18 @@ namespace ManageIntegration.Controllers
             CompanyMappingViewModel companyMappingViewModel = new CompanyMappingViewModel();
 
             Config config = await _appDb.GetConfigAsync();
-     
+
+            if(config.ManageClientId == "" || config.ManagePubKey == "")
+            {
+                companyMappingViewModel.DefaultOrganization = new ThreatLockerOrganization { ManageCompanyId = 1, Name = " ", OrganizationId =" " };
+                companyMappingViewModel.ManageCompanies = new List<ManageCompany> { new ManageCompany { Name = " ", Id = 1 } };
+                companyMappingViewModel.ThreatLockerOrganizations = new List<ThreatLockerOrganization> { new ThreatLockerOrganization { ManageCompanyId = 1, Name = " ", OrganizationId = " " }  };
+
+                ViewBag.ManageCompanyList = new List<ManageCompany> { new ManageCompany { Name = " ", Id = 1 } };
+
+                return View(companyMappingViewModel);
+            }
+
             companyMappingViewModel.ThreatLockerOrganizations = await _appDb.GetThreatLockerOrganizationsAsync();
             if (companyMappingViewModel.ThreatLockerOrganizations == null)
             {
