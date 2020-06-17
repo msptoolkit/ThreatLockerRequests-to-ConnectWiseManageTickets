@@ -46,6 +46,26 @@ namespace ManageIntegration
             return config;
         }
 
+        public async Task<List<ManageCompany>> GetManageCompaniesAsync()
+        {
+            var manageCompanies = new List<ManageCompany>();
+            await Connection.OpenAsync();
+
+            using (var cmd = new MySqlCommand("SELECT Id, Name, Identifier FROM managecompanies", Connection))
+            using (var reader = await cmd.ExecuteReaderAsync())
+                while (await reader.ReadAsync())
+                {
+                    var manageCompany = new ManageCompany()
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        Identifier = reader.GetString(2),
+                    };
+                    manageCompanies.Add(manageCompany);
+                }
+            Connection.Close();
+            return manageCompanies;
+        }
         public async Task SaveConfigAsync(Config config)
         {
             await Connection.OpenAsync();

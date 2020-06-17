@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using ManageIntegration.DAL;
 using ManageIntegration.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
-using ManageIntegration.DAL;
-using RestSharp;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using TLManageService.Models;
 
 namespace ManageIntegration.Controllers
 {
@@ -38,7 +38,7 @@ namespace ManageIntegration.Controllers
         {
             await _appDb.SaveConfigAsync(model);
 
-            List<ManageCompany> manageCompanies = ManageAccess.GetCompanies(model);
+            List<ManageCompany> manageCompanies = ManageAccess.GetCompanies(model, null);
             List<ThreatLockerOrganization> threatLockerOrganizations = ThreatLockerAccess.GetOrganizations(model);
 
             await _appDb.SaveManageCompanies(manageCompanies);
@@ -53,9 +53,8 @@ namespace ManageIntegration.Controllers
         {
             Config config = await _appDb.GetConfigAsync();
             ManageConfig manageConfig = await _appDb.GetManageConfigAsync();
+            List<ManageCompany> manageCompanies = await _appDb.GetManageCompaniesAsync();
             List<ManageBoard> manageBoards = ManageAccess.GetBoards(config);
-
-            ViewBag.ListOfBoards = manageBoards;
 
             manageConfig.ManageBoard = ManageAccess.GetBoard(config, manageConfig.BoardId);
             manageConfig.ManageBoards = manageBoards;
@@ -69,7 +68,6 @@ namespace ManageIntegration.Controllers
             manageConfig.ManageBoardPriority = ManageAccess.GetBoardPriority(config, manageConfig.PriorityId);
             manageConfig.ManageBoardStatuses = ManageAccess.GetBoardStatuses(config, manageConfig.BoardId);
             manageConfig.ManageBoardStatus = ManageAccess.GetBoardStatus(config, manageConfig.BoardId, manageConfig.StatusId);
-
 
             return View(manageConfig);
         }
@@ -109,8 +107,7 @@ namespace ManageIntegration.Controllers
             model.ManageBoardStatuses = ManageAccess.GetBoardStatuses(config, manageConfig.BoardId);
             model.ManageBoardStatus = ManageAccess.GetBoardStatus(config, manageConfig.BoardId, manageConfig.StatusId);
 
-            List<ManageCompany> manageComapies = ManageAccess.GetCompanies(config);
-            model.ManageCompanies = manageComapies;
+            List<ManageCompany> manageComapies = ManageAccess.GetCompanies(config, null);
             ViewBag.ListOfBoards = manageBoards;
 
             await _appDb.SaveManageConfigAsync(model);
@@ -145,7 +142,16 @@ namespace ManageIntegration.Controllers
 
             companyMappingViewModel.DefaultOrganization = await _appDb.GetDefaultThreatLockerOrganization();
 
-            ViewBag.ManageCompanyList = ManageAccess.GetCompanies(config);
+            List<ManageCompany> manageCompanyList = new List<ManageCompany>();
+            manageCompanyList = await _appDb.GetManageCompaniesAsync();
+
+            if(manageCompanyList == null)
+            {
+                manageCompanyList = ManageAccess.GetCompanies(config, null);
+            }
+
+            ViewBag.ManageCompanyList = manageCompanyList;
+
             companyMappingViewModel.DefaultOrganization = await _appDb.GetDefaultThreatLockerOrganization();
 
             return View(companyMappingViewModel);
@@ -156,10 +162,62 @@ namespace ManageIntegration.Controllers
         {
             Config config = await _appDb.GetConfigAsync();
 
-            ViewBag.ManageCompanyList = ManageAccess.GetCompanies(config);
+            ViewBag.ManageCompanyList = ManageAccess.GetCompanies(config, null);
 
             await _appDb.SaveThreatLockerOrganizations(model.ThreatLockerOrganizations);
             await _appDb.SaveDefaultThreatLockerOrganization(model.DefaultOrganization);
+
+            return View(model);
+        }
+
+        [HttpGet("getmanagecompanies")]
+        public async Task<IActionResult> GetManageCompanies()
+        {
+            List<ManageCompany> manageCompanies = new List<ManageCompany>();
+            Config config = await _appDb.GetConfigAsync();
+            if (ViewBag.ManageCompanies == null)
+            {
+                manageCompanies = await _appDb.GetManageCompaniesAsync();
+            }
+            else
+            {
+                manageCompanies = ViewBag.ManageCompanies;
+            }
+
+            ManageCompanyViewModel manageCompanyViewModel = new ManageCompanyViewModel();
+
+            manageCompanyViewModel.ManageCompanies = manageCompanies;
+            manageCompanyViewModel.ManageCompanyStatuses = ManageAccess.GetCompanyStatuses(config);
+            manageCompanyViewModel.ManageCompanyTypes = ManageAccess.GetCompanyTypes(config);
+
+
+            return View(manageCompanyViewModel);
+        }
+
+        [HttpPost("getmanagecompanies")]
+        public async Task<IActionResult> GetManageCompanies(ManageCompanyViewModel model)
+        {
+            Config config = await _appDb.GetConfigAsync();
+            List<ManageCompany> manageCompanies = await _appDb.GetManageCompaniesAsync();
+            List<int> manageCompanyStatuses = new List<int>();
+            List<int> manageCompanyTypes = new List<int>();
+
+            foreach (var key in Request.Form["ManageCompanyStatuses"])
+            {
+                manageCompanyStatuses.Add(int.Parse(key));
+            }
+            foreach (var key in Request.Form["ManageCompanyTypes"])
+            {
+                manageCompanyTypes.Add(int.Parse(key));
+            }
+            model.ManageCompanyStatusIds = manageCompanyStatuses;
+            model.ManageCompanyTypeIds = manageCompanyTypes;
+            model.ManageCompanyStatuses = ManageAccess.GetCompanyStatuses(config);
+            model.ManageCompanyTypes = ManageAccess.GetCompanyTypes(config);
+
+            string manageCompanyFilterUrl = ManageAccess.CreateCompanyFilterUrl(manageCompanyStatuses, manageCompanyTypes);
+
+            ViewBag.ManageCompanies = ManageAccess.GetCompanies(config, manageCompanyFilterUrl);
 
             return View(model);
         }
@@ -219,7 +277,19 @@ namespace ManageIntegration.Controllers
             return Json(new SelectList(manageBoardStatuses, "BoardStatusId", "BoardStatusName"));
         }
 
-        public List<ThreatLockerOrganization> AutoMatchOrganizations(List<ThreatLockerOrganization> threatLockerOrganizations, List<ManageCompany> manageCompanies)
+        public async Task<JsonResult> GetFilteredManageCompaniesJson (string FilterUrl)
+        {
+            Config config = await _appDb.GetConfigAsync();
+            List<ManageCompany> manageCompanies = new List<ManageCompany>();
+            manageCompanies = ManageAccess.GetCompanies(config, null);
+
+
+            return Json(new SelectList(manageCompanies, "BoardStatusId", "BoardStatusName"));
+        }
+
+
+
+        public async Task<List<ThreatLockerOrganization>> AutoMatchOrganizations(List<ThreatLockerOrganization> threatLockerOrganizations, List<ManageCompany> manageCompanies)
         {
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
             List<ThreatLockerOrganization> matchedOrgs = new List<ThreatLockerOrganization>();
@@ -236,7 +306,7 @@ namespace ManageIntegration.Controllers
                 }
             }
 
-            _appDb.SaveThreatLockerOrganizations(matchedOrgs);
+            await _appDb.SaveThreatLockerOrganizations(matchedOrgs);
 
 
             return matchedOrgs;

@@ -1,0 +1,66 @@
+﻿@model TLManageService.Models.ManageCompanyViewModel
+@{
+    ViewBag.Title = "Manage Companies";
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+
+<div class="card card-body bg-light">
+    <h4>@ViewData["Title"]</h4>
+
+    <form asp-controller="Home" asp-action="getmanagecompanies" method="post" role="form" class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Company Statuses</label>
+                    <select size="@Model.ManageCompanyStatuses.Count" class="form-control" id="ManageCompanyStatuses" name="ManageCompanyStatuses" asp-for="ManageCompanyStatuses" asp-items="@(new SelectList(Model.ManageCompanyStatuses, "Id", "Name", Model.ManageCompanyStatuses))"></select>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Company Types</label>
+                    <select size="@Model.ManageCompanyTypes.Count" class="form-control" id="ManageCompanyTypes" name="ManageCompanyTypes" asp-for="ManageCompanyTypes" asp-items="@(new SelectList(Model.ManageCompanyTypes, "Id", "Name", Model.ManageCompanyTypes))"></select>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <input id="Submit" type="submit" value="Update" class="btn btn-primary">
+            <div>@ViewBag.UserMessage</div>
+        </div>
+    </form>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <b>ID</b>
+            </div>
+            <div class="col-sm-5">
+                <b>Name</b>
+            </div>
+            <div class="col-sm-5">
+                <b>Identifier</b>
+            </div>
+        </div>
+        @foreach (var item in Model.ManageCompanies)
+        {
+            <div class="row">
+                <div class="col-sm-1">
+                    @Html.DisplayFor(modelItem => item.Id)<br />
+                </div>
+                <div class="col-sm-5">
+                    @Html.DisplayFor(modelItem => item.Name)<br />
+                </div>
+                <div class="col-sm-5">
+                    @Html.DisplayFor(modelItem => item.Identifier)<br />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+</script>

@@ -26,7 +26,6 @@ namespace ManageIntegration.Models
         public ManageBoardStatus ManageBoardStatus { get; set; }
         public int StatusId { get; set; }
         public string TicketSummary { get; set; }
-        public List<ManageCompany> ManageCompanies { get; set; }
         public List<ManageBoard> ManageBoards { get; set; }
         public List<ManageBoardType> ManageBoardTypes { get; set; }
         public List<ManageBoardSubType> ManageBoardSubTypes { get; set; }

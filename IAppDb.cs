@@ -19,5 +19,6 @@ namespace ManageIntegration
         Task SaveManageConfigAsync(ManageConfig manageConfig);
         Task<ThreatLockerOrganization> GetDefaultThreatLockerOrganization();
         Task SaveDefaultThreatLockerOrganization(ThreatLockerOrganization threatLockerOrganization);
+        Task<List<ManageCompany>> GetManageCompaniesAsync();
     }
 }

@@ -4,53 +4,55 @@
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
-<div class="col-md-6 offset-md-3">
-    <div class="card card-body bg-light">
-        <h4>@ViewData["Title"]</h4>
-        <form asp-controller="Home" asp-action="manageconfig" method="post" role="form">
 
-            <div class="form-group">
-                <label>Board</label>
-                <select class="form-control" id="BoardId" name="BoardId" asp-for="ManageBoard.Id" asp-items="@(new SelectList(Model.ManageBoards, "Id", "Name", Model.ManageBoard.Id))"></select>
-            </div>
+<div class="card card-body bg-light">
+    <h4>@ViewData["Title"]</h4>
 
-            <div class="form-group">
-                <label>Ticket Type</label>
-                <select class="form-control" id="BoardTypeId" name="BoardTypeId" asp-for="ManageBoardType.BoardTypeId" asp-items="@(new SelectList(Model.ManageBoardTypes, "BoardTypeId", "BoardTypeName", Model.ManageBoardType.BoardTypeId))"></select>
-            </div>
+    <form asp-controller="Home" asp-action="manageconfig" method="post" role="form">
 
-            <div class="form-group">
-                <label>Ticket Sub Type</label>
-                <select class="form-control" id="BoardSubTypeId" name="BoardSubTypeId" asp-for="ManageBoardSubType.BoardSubTypeId" asp-items="@(new SelectList(Model.ManageBoardSubTypes, "BoardSubTypeId", "BoardSubTypeName", Model.ManageBoardSubType.BoardSubTypeId))"></select>
-            </div>
+        <div class="form-group">
+            <label>Board</label>
+            <select class="form-control" id="BoardId" name="BoardId" asp-for="ManageBoard.Id" asp-items="@(new SelectList(Model.ManageBoards, "Id", "Name", Model.ManageBoard.Id))"></select>
+        </div>
 
-            <div class="form-group">
-                <label>Ticket Item</label>
-                <select class="form-control" id="BoardItemId" name="BoardItemId" asp-for="ManageBoardItem.BoardItemId" asp-items="@(new SelectList(Model.ManageBoardItems, "BoardItemId", "BoardItemName", Model.ManageBoardItem.BoardItemId))"></select>
-            </div>
+        <div class="form-group">
+            <label>Ticket Type</label>
+            <select class="form-control" id="BoardTypeId" name="BoardTypeId" asp-for="ManageBoardType.BoardTypeId" asp-items="@(new SelectList(Model.ManageBoardTypes, "BoardTypeId", "BoardTypeName", Model.ManageBoardType.BoardTypeId))"></select>
+        </div>
 
-            <div class="form-group">
-                <label>Ticket Priority</label>
-                <select class="form-control" id="BoardPriorityId" name="BoardPriorityId" asp-for="ManageBoardPriority.BoardPriorityId" asp-items="@(new SelectList(Model.ManageBoardPriorities, "BoardPriorityId", "BoardPriorityName", Model.ManageBoardPriority.BoardPriorityId))"></select>
-            </div>
+        <div class="form-group">
+            <label>Ticket Sub Type</label>
+            <select class="form-control" id="BoardSubTypeId" name="BoardSubTypeId" asp-for="ManageBoardSubType.BoardSubTypeId" asp-items="@(new SelectList(Model.ManageBoardSubTypes, "BoardSubTypeId", "BoardSubTypeName", Model.ManageBoardSubType.BoardSubTypeId))"></select>
+        </div>
 
-            <div class="form-group">
-                <label>Ticket Status</label>
-                <select class="form-control" id="BoardStatusId" name="BoardStatusId" asp-for="ManageBoardStatus.BoardStatusId" asp-items="@(new SelectList(Model.ManageBoardStatuses, "BoardStatusId", "BoardStatusName", Model.ManageBoardStatus.BoardStatusId))"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="TicketSummary">Ticket Summary</label>
-                <input type="text" asp-for="TicketSummary" class="form-control" />
-                <span asp-validation-for="TicketSummary" class="text-danger"></span>
-            </div>
+        <div class="form-group">
+            <label>Ticket Item</label>
+            <select class="form-control" id="BoardItemId" name="BoardItemId" asp-for="ManageBoardItem.BoardItemId" asp-items="@(new SelectList(Model.ManageBoardItems, "BoardItemId", "BoardItemName", Model.ManageBoardItem.BoardItemId))"></select>
+        </div>
 
-            <div class="form-group">
-                <input id="Submit" type="submit" value="Save" class="btn btn-primary">
-                <div>@ViewBag.UserMessage</div>
-            </div>
-        </form>
-    </div>
+        <div class="form-group">
+            <label>Ticket Priority</label>
+            <select class="form-control" id="BoardPriorityId" name="BoardPriorityId" asp-for="ManageBoardPriority.BoardPriorityId" asp-items="@(new SelectList(Model.ManageBoardPriorities, "BoardPriorityId", "BoardPriorityName", Model.ManageBoardPriority.BoardPriorityId))"></select>
+        </div>
+
+        <div class="form-group">
+            <label>Ticket Status</label>
+            <select class="form-control" id="BoardStatusId" name="BoardStatusId" asp-for="ManageBoardStatus.BoardStatusId" asp-items="@(new SelectList(Model.ManageBoardStatuses, "BoardStatusId", "BoardStatusName", Model.ManageBoardStatus.BoardStatusId))"></select>
+        </div>
+        <div class="form-group">
+            <label asp-for="TicketSummary">Ticket Summary</label>
+            <input type="text" asp-for="TicketSummary" class="form-control" />
+            <span asp-validation-for="TicketSummary" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input id="Submit" type="submit" value="Save" class="btn btn-primary">
+            <div>@ViewBag.UserMessage</div>
+        </div>
+
+    </form>
 </div>
+
 
 <script type="text/javascript">
 

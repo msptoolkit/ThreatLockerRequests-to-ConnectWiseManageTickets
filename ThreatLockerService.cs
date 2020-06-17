@@ -37,6 +37,7 @@ namespace TLManageService
 
                 ManageConfig manageConfig = await _appDb.GetManageConfigAsync();
                 ManageTicket manageTicket = new ManageTicket();
+                manageTicket.Company = new ManageCompany() { Name = "", Id = 0 };
                 List<ThreatLockerOrganization> threatLockerOrganizations = await _appDb.GetThreatLockerOrganizationsAsync();
                 _logger.LogInformation($"Checking for requests.");
                 List<ThreatLockerRequest> threatLockerRequests = ThreatLockerAccess.GetRequests(config);

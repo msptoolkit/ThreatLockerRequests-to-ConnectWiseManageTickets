@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ManageIntegration.DAL
@@ -31,38 +32,56 @@ namespace ManageIntegration.DAL
 
             return result;
         }
-        public static List<ManageCompany> GetCompanies(Config config)
-        {
-            var client = new RestClient(config.ManageUrl);
-            client.Authenticator = new HttpBasicAuthenticator(config.ManageCompanyName + "+" + config.ManagePubKey, config.ManagePriKey);
-
-            var request = new RestRequest("/V4_6_release/apis/3.0/company/companies/", DataFormat.Json);
-            request.AddHeader("Accept", "application/vnd.connectwise.com+json; version=3.0.0; application/json");
-            request.AddHeader("clientid", config.ManageClientId);
-
-            var response = client.Get(request);
-
-            var result = JsonConvert.DeserializeObject<List<ManageCompany>>(response.Content);
-
-            return result;
-        }
-
         public static List<ManageCompany> GetCompanies(Config config, string filterUrl)
         {
             var client = new RestClient(config.ManageUrl);
+            if (filterUrl == null)
+            {
+                filterUrl = "company/companies?pageSize=1000&page=1";
+            }
+
             client.Authenticator = new HttpBasicAuthenticator(config.ManageCompanyName + "+" + config.ManagePubKey, config.ManagePriKey);
 
-            var request = new RestRequest("/V4_6_release/apis/3.0/" + filterUrl, DataFormat.Json);
+            var request = new RestRequest($"/V4_6_release/apis/3.0/{filterUrl}", DataFormat.Json);
             request.AddHeader("Accept", "application/vnd.connectwise.com+json; version=3.0.0; application/json");
             request.AddHeader("clientid", config.ManageClientId);
 
             var response = client.Get(request);
+            List<ManageCompany> manageCompanies = new List<ManageCompany>();
+            var link = response.Headers.ToList()
+            .Find(x => x.Name == "Link")
+            .Value.ToString();
 
-            var result = JsonConvert.DeserializeObject<List<ManageCompany>>(response.Content);
+            string nextUrl;
+            if (link == "")
+            {
+                nextUrl = null;
+            }
+            else
+            {
+                nextUrl = LinkHeader.LinksFromHeader(link).NextLink;
+            }
 
-            return result;
+            manageCompanies.AddRange(JsonConvert.DeserializeObject<List<ManageCompany>>(response.Content));
+
+            while (nextUrl != null)
+            {
+                var nextRequest = new RestRequest(nextUrl);
+                nextRequest.AddHeader("Accept", "application/vnd.connectwise.com+json; version=3.0.0; application/json");
+                nextRequest.AddHeader("clientid", config.ManageClientId);
+
+                var nextResponse = client.Get(nextRequest);
+                manageCompanies.AddRange(JsonConvert.DeserializeObject<List<ManageCompany>>(nextResponse.Content));
+
+                var nextLink = nextResponse.Headers.ToList()
+                .Find(x => x.Name == "Link")
+                .Value.ToString();
+
+                nextUrl = LinkHeader.LinksFromHeader(nextLink).NextLink;
+
+            }
+            return manageCompanies;
         }
-
 
         public static List<ManageCompanyType> GetCompanyTypes(Config config)
         {
@@ -97,7 +116,7 @@ namespace ManageIntegration.DAL
             return result;
         }
 
-        public static string CreateCompanyFilterUrl(List<ManageCompanyStatus> manageCompanyStatuses, List<ManageCompanyType> manageCompanyTypes)
+        public static string CreateCompanyFilterUrl(List<int> manageCompanyStatuses, List<int> manageCompanyTypes)
         {
             string statuses = "";
             string types = "";
@@ -105,21 +124,21 @@ namespace ManageIntegration.DAL
             foreach (var s in manageCompanyStatuses)
             {
                 if (string.IsNullOrEmpty(statuses))
-                    statuses = s.Id.ToString();
+                    statuses = s.ToString();
                 else
-                    statuses = string.Concat(statuses, ",", s.Id);
+                    statuses = string.Concat(statuses, ",", s.ToString());
             }
 
             foreach (var t in manageCompanyTypes)
             {
                 if (string.IsNullOrEmpty(types))
-                    types = t.Id.ToString();
+                    types = t.ToString();
                 else
-                    types = string.Concat(types, "%20or%20types%2Fid%20%3D%20", t.Id);
+                    types = string.Concat(types, "%20or%20types%2Fid%20%3D%20", t.ToString());
             }
 
 
-            string url = string.Concat("company/companies?pageSize=1000&conditions=status/id%20in%20(", statuses, ")%26childconditions%3Dtypes%2Fid%20%3D%20", types, "&orderBy=name");
+            string url = string.Concat("company/companies?pageSize=1000&page=1&conditions=status/id%20in%20(", statuses, ")%26childconditions%3Dtypes%2Fid%20%3D%20", types, "&orderBy=name");
 
             var result = System.Web.HttpUtility.UrlDecode(url);
             return result;
@@ -348,6 +367,59 @@ namespace ManageIntegration.DAL
             var response = client.Post(request);
 
             return response.StatusCode;
+        }
+    }
+
+    public class LinkHeader
+    {
+        public string FirstLink { get; set; }
+        public string PrevLink { get; set; }
+        public string NextLink { get; set; }
+        public string LastLink { get; set; }
+
+        public static LinkHeader LinksFromHeader(string linkHeaderStr)
+        {
+            LinkHeader linkHeader = null;
+
+            if (!string.IsNullOrWhiteSpace(linkHeaderStr))
+            {
+                string[] linkStrings = linkHeaderStr.Split(',');
+
+                if (linkStrings != null && linkStrings.Any())
+                {
+                    linkHeader = new LinkHeader();
+
+                    foreach (string linkString in linkStrings)
+                    {
+                        var relMatch = Regex.Match(linkString, "(?<=rel=\").+?(?=\")", RegexOptions.IgnoreCase);
+                        var linkMatch = Regex.Match(linkString, "(?<=<).+?(?=>)", RegexOptions.IgnoreCase);
+
+                        if (relMatch.Success && linkMatch.Success)
+                        {
+                            string rel = relMatch.Value.ToUpper();
+                            string link = linkMatch.Value;
+
+                            switch (rel)
+                            {
+                                case "FIRST":
+                                    linkHeader.FirstLink = link;
+                                    break;
+                                case "PREV":
+                                    linkHeader.PrevLink = link;
+                                    break;
+                                case "NEXT":
+                                    linkHeader.NextLink = link;
+                                    break;
+                                case "LAST":
+                                    linkHeader.LastLink = link;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return linkHeader;
         }
     }
 }

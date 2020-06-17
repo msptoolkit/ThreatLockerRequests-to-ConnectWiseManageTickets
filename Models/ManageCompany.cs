@@ -11,8 +11,6 @@ namespace ManageIntegration.Models
         public int Id { get; set; }
         public string Identifier { get; set; }
         public string Name { get; set; }
-        public ManageCompanyStatus Status { get; set; }
-        public List<ManageCompanyType> Types { get; set; }
     }
 
     public class ManageCompanyType
